@@ -1,0 +1,20 @@
+
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Docker Hub
+      - echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+
+  build:
+    commands:
+      - echo Building Docker image
+      - docker build -t "$DOCKERHUB_USERNAME/website:latest" .
+      - docker tag "$DOCKERHUB_USERNAME/website:latest" "$DOCKERHUB_USERNAME/website:$CODEBUILD_BUILD_NUMBER"
+
+  post_build:
+    commands:
+      - echo Pushing Docker images to Docker Hub
+      - docker push "$DOCKERHUB_USERNAME/website:latest"
+      - docker push "$DOCKERHUB_USERNAME/website:$CODEBUILD_BUILD_NUMBER"
